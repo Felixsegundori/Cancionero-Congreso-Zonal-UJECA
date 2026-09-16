@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cancionero Digital</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text); padding: 15px; max-width: 800px; margin: 0 auto; }
+
+    header { text-align: center; margin-bottom: 20px; padding: 10px 0; }
+    header h1 { color: var(--accent); font-size: 1.8rem; margin-bottom: 5px; }
+
+    .search-box { margin-bottom: 15px; }
+    .search-box input {
+      width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid #334155;
+      background: var(--card-bg); color: var(--text); font-size: 1rem; outline: none;
+    }
+    .search-box input:focus { border-color: var(--accent); }
+
+    .song-list { display: grid; gap: 10px; }
+    .song-card {
+      background: var(--card-bg); padding: 15px; border-radius: 10px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+    }
+    .song-card:hover { background: #334155; }
+    .song-title { font-weight: bold; font-size: 1.1rem; }
+    .song-artist { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Modal / Visor de Canción */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.9); padding: 20px; overflow-y: auto; z-index: 100;
+    }
+    .modal-content { max-width: 600px; margin: 20px auto; background: var(--card-bg); padding: 25px; border-radius: 12px; }
+    .btn-close {
+      background: var(--accent); color: #000; border: none; padding: 8px 16px;
+      font-weight: bold; border-radius: 6px; cursor: pointer; float: right;
+    }
+    .lyrics-body { margin-top: 20px; white-space: pre-line; font-size: 1.1rem; line-height: 1.6; color: #e2e8f0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📖 Cancionero Digital</h1>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">Encuentra y sigue las letras en vivo</p>
+  </header>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 Buscar canción o artista..." onkeyup="filterSongs()">
+  </div>
+
+  <div class="song-list" id="songList"></div>
+
+  <!-- Vista Modal para la Letra -->
+  <div class="modal" id="songModal">
+    <div class="modal-content">
+      <button class="btn-close" onclick="closeSong()">Cerrar ✕</button>
+      <h2 id="modalTitle" style="color: var(--accent);"></h2>
+      <p id="modalArtist" style="color: var(--text-muted); margin-bottom: 15px;"></p>
+      <hr style="border-color: #334155;">
+      <div class="lyrics-body" id="modalLyrics"></div>
+    </div>
+  </div>
+
+  <script>
+    // BASE DE DATOS DE CANCIONES (Agrega o edita tus canciones aquí)
+    const songs = [
+      {
+        id: 1,
+        title: "Por Siempre Tú Reinarás",
+        artist: "Generación 12",
+        lyrics: `Nuestro Dios reinará
+Por siempre Tú reinarás
+
+Reina sobre mi vida
+Nuestro Dios reinará
+Por siempre Tú reinarás
+
+Te reconoceremos como nuestro Rey
+Nuestro Dios reinará
+Por siempre Tú reinarás`
+      },
+      {
+        id: 2,
+        title: "Tu Pueblo Dice Gracias",
+        artist: "Jacobo Ramos",
+        lyrics: `Cuán amor inagotable
+Fidelidad incomparable
+Grandes cosas ha hecho Dios por su pueblo
+
+Y toda la creación se levanta
+Y delante de su trono proclama
+¡Qué grande y bueno es Dios!
+
+Tu pueblo dice ¡GRACIAS!`
+      }
+    ];
+
+    function loadSongs(data) {
+      const container = document.getElementById('songList');
+      container.innerHTML = '';
+      data.forEach(song => {
+        container.innerHTML += `
+          <div class="song-card" onclick="openSong(${song.id})">
+            <div>
+              <div class="song-title">${song.title}</div>
+              <div class="song-artist">${song.artist}</div>
+            </div>
+            <span style="color: var(--accent);">▶</span>
+          </div>
+        `;
+      });
+    }
+
+    function filterSongs() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = songs.filter(s => 
+        s.title.toLowerCase().includes(query) || 
+        s.artist.toLowerCase().includes(query)
+      );
+      loadSongs(filtered);
+    }
+
+    function openSong(id) {
+      const song = songs.find(s => s.id === id);
+      document.getElementById('modalTitle').innerText = song.title;
+      document.getElementById('modalArtist').innerText = song.artist;
+      document.getElementById('modalLyrics').innerText = song.lyrics;
+      document.getElementById('songModal').style.display = 'block';
+    }
+
+    function closeSong() {
+      document.getElementById('songModal').style.display = 'none';
+    }
+
+    // Cargar lista inicial
+    loadSongs(songs);
+  </script>
+</body>
+</html>
